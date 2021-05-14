@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: library-api
+  jpa:
+    show-sql: true
+    open-in-view: true
