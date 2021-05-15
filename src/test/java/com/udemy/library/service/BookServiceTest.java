@@ -1,9 +1,11 @@
 package com.udemy.library.service;
 
+import com.sun.source.tree.LambdaExpressionTree;
 import com.udemy.library.domain.Book;
 import com.udemy.library.exception.BusinessException;
 import com.udemy.library.repository.BookRepository;
 import com.udemy.library.service.impl.BookServiceImpl;
+import lombok.extern.log4j.Log4j2;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,9 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -22,6 +29,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
+@Log4j2
 public class BookServiceTest {
 
     BookService bookService;
@@ -156,5 +164,30 @@ public class BookServiceTest {
 
         Mockito.verify(bookRepository, never()).save(new Book());
     }
+
+    @Test
+    @DisplayName("Should filter books")
+    public void ShouldFilterBookTest() throws Exception {
+        // cenario
+        Book book = createValidBook();
+
+        Page<Book> page = new PageImpl<Book>(Arrays.asList(book), PageRequest.of(0,10), 1);
+
+        when(bookRepository.findAll(any(Example.class), any(PageRequest.class))).thenReturn(page);
+
+        // execução
+        Page<Book> books = bookService.find(0, 10, book);
+        log.info(books.toString());
+
+        verify(bookRepository, times(1)).findAll(any(Example.class), any(PageRequest.class));
+
+        // verificação
+        assertThat(books.getTotalElements()).isEqualTo(1);
+        assertThat(books.getContent()).isEqualTo(Arrays.asList(book));
+        assertThat(books.getPageable().getPageNumber()).isEqualTo(0);
+        assertThat(books.getPageable().getPageSize()).isEqualTo(10);
+
+    }
+
 
 }

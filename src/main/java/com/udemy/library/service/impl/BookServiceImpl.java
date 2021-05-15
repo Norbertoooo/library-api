@@ -4,6 +4,7 @@ import com.udemy.library.domain.Book;
 import com.udemy.library.exception.BusinessException;
 import com.udemy.library.repository.BookRepository;
 import com.udemy.library.service.BookService;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -32,7 +33,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void delete(Book book) {
-        if (book == null || book.getId() == null)  {
+        if (book == null || book.getId() == null) {
             throw new IllegalArgumentException("Book id cant be null.");
         }
         bookRepository.delete(book);
@@ -40,10 +41,21 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book update(Book book) {
-        if ( book == null || book.getId() == null ) {
+        if (book == null || book.getId() == null) {
             throw new IllegalArgumentException("Book id cant be null.");
         }
         return bookRepository.save(book);
+    }
+
+    @Override
+    public Page<Book> find(Integer page, Integer size, Book filter) {
+        Example<Book> example = Example.of(filter,
+                ExampleMatcher.matching()
+                        .withIgnoreCase()
+                        .withIgnoreNullValues()
+                        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
+        Pageable pageable = PageRequest.of(page, size);
+        return bookRepository.findAll(example, pageable);
     }
 
 }

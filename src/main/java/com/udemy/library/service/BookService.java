@@ -1,6 +1,7 @@
 package com.udemy.library.service;
 
 import com.udemy.library.domain.Book;
+import org.springframework.data.domain.Page;
 
 import java.util.Optional;
 
@@ -13,4 +14,6 @@ public interface BookService {
     void delete(Book book);
 
     Book update(Book book);
+
+    Page<Book> find(Integer pagina, Integer tamanho, Book filter);
 }

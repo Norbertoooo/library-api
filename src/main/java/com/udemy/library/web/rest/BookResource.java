@@ -7,6 +7,9 @@ import com.udemy.library.web.rest.dto.BookDTO;
 import com.udemy.library.web.rest.errors.ApiErrors;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/books")
@@ -42,6 +47,16 @@ public class BookResource {
         return bookService.findById(id)
                 .map( book -> modelMapper.map(book, BookDTO.class))
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping()
+    public Page<BookDTO> find(Integer page, Integer size, BookDTO bookDTO) {
+        log.info("Request to find book:");
+        Page<Book> result = bookService.find(page, size, modelMapper.map(bookDTO, Book.class));
+        List<BookDTO> bookDTOS = result.getContent().stream()
+                .map(book -> modelMapper.map(book, BookDTO.class))
+                .collect(Collectors.toList());
+        return new PageImpl<BookDTO>(bookDTOS, PageRequest.of(page, size), result.getTotalElements());
     }
 
     @PutMapping("/{id}")
