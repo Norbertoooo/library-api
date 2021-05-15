@@ -6,6 +6,8 @@ import com.udemy.library.repository.BookRepository;
 import com.udemy.library.service.BookService;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class BookServiceImpl implements BookService {
 
@@ -19,6 +21,27 @@ public class BookServiceImpl implements BookService {
     public Book save(Book book) {
         if (bookRepository.existsByIsbn(book.getIsbn())) {
             throw new BusinessException("Isbn já cadastrada");
+        }
+        return bookRepository.save(book);
+    }
+
+    @Override
+    public Optional<Book> findById(Long id) {
+        return bookRepository.findById(id);
+    }
+
+    @Override
+    public void delete(Book book) {
+        if (book == null || book.getId() == null)  {
+            throw new IllegalArgumentException("Book id cant be null.");
+        }
+        bookRepository.delete(book);
+    }
+
+    @Override
+    public Book update(Book book) {
+        if ( book == null || book.getId() == null ) {
+            throw new IllegalArgumentException("Book id cant be null.");
         }
         return bookRepository.save(book);
     }

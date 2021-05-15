@@ -21,7 +21,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -105,6 +109,128 @@ public class BookResourceTest {
                 .andExpect(jsonPath("errors[0]").value("Isbn já cadastrada"))
                 .andDo(print());
 
+    }
+
+    @Test
+    @DisplayName("Should get book information")
+    public void getBookInformaticions() throws Exception {
+        // cénario (given, dado).
+        Book book = createValidBook();
+        given(bookService.findById(book.getId())).willReturn(Optional.of(book));
+
+        // execução (when, quando)
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get(BOOK_API.concat("/" + book.getId()))
+                .accept(MediaType.APPLICATION_JSON);
+
+        //
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(book.getId()))
+                .andExpect(jsonPath("title").value(book.getTitle()))
+                .andExpect(jsonPath("author").value(book.getAuthor()))
+                .andExpect(jsonPath("isbn").value(book.getIsbn()))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("Should return resource not found when search for a book that dont exist")
+    public void bookNotFoundTest() throws Exception {
+        // cénario (given, dado).
+        given(bookService.findById(anyLong())).willReturn(Optional.empty());
+
+        // execução (when, quando)
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get(BOOK_API.concat("/" + anyLong()))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("Should delete book")
+    public void deleteBookTest() throws Exception {
+        // cénario (given, dado).
+        Book book = createValidBook();
+        given(bookService.findById(book.getId())).willReturn(Optional.of(book));
+
+        // execução (when, quando)
+        MockHttpServletRequestBuilder requestBuilder = delete(BOOK_API.concat("/" + book.getId()));
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isNoContent())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("Should return resource not found when delete a book that dont exist")
+    public void bookNotFoundTestWhenDeleteBook() throws Exception {
+        // cénario (given, dado).
+        given(bookService.findById(anyLong())).willReturn(Optional.empty());
+
+        // execução (when, quando)
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete(BOOK_API.concat("/" + anyLong()))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("Should update book")
+    public void updateBook() throws Exception {
+        // cénario (given, dado)
+        Book book = createValidBook();
+        Book bookReturned = Book.builder().id(1L).isbn(123321L).author("annhanham").title("houly").build();
+        String json = new ObjectMapper().writeValueAsString(book);
+
+        given(bookService.findById(bookReturned.getId())).willReturn(Optional.of(bookReturned));
+        given(bookService.update(book)).willReturn(book);
+
+        // execução (when, quando)
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put(BOOK_API.concat("/" + bookReturned.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(bookReturned.getId()))
+                .andExpect(jsonPath("title").value(book.getTitle()))
+                .andExpect(jsonPath("author").value(book.getAuthor()))
+                .andExpect(jsonPath("isbn").value(book.getIsbn()))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("Should return resource not found when update a book that dont exist")
+    public void bookNotFoundTestWhenUpdateBook() throws Exception {
+
+        String json = new ObjectMapper().writeValueAsString(createValidBook());
+
+        // cénario (given, dado).
+        given(bookService.findById(anyLong())).willReturn(Optional.empty());
+
+        // execução (when, quando)
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put(BOOK_API.concat("/" + anyLong()))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
+
+    private Book createValidBook() {
+        return Book.builder()
+                .id(1L)
+                .isbn(123321L)
+                .title("o carrasco")
+                .author("draven")
+                .build();
     }
 
 }
