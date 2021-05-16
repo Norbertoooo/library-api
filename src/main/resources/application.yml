@@ -4,3 +4,13 @@ spring:
   jpa:
     show-sql: true
     open-in-view: true
+  boot:
+    admin:
+      client:
+        url: http://localhost:8081/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
