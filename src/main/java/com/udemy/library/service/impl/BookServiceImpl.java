@@ -58,4 +58,9 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findAll(example, pageable);
     }
 
+    @Override
+    public Optional<Book> getBookByIsbn(Long isbn) {
+        return bookRepository.findByIsbn(isbn);
+    }
+
 }

@@ -16,4 +16,6 @@ public interface BookService {
     Book update(Book book);
 
     Page<Book> find(Integer pagina, Integer tamanho, Book filter);
+
+    Optional<Book> getBookByIsbn(Long isbn);
 }

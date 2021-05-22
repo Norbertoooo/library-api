@@ -1,6 +1,5 @@
 package com.udemy.library.service;
 
-import com.sun.source.tree.LambdaExpressionTree;
 import com.udemy.library.domain.Book;
 import com.udemy.library.exception.BusinessException;
 import com.udemy.library.repository.BookRepository;
@@ -71,7 +70,7 @@ public class BookServiceTest {
 
         when(bookRepository.existsByIsbn(anyLong())).thenReturn(true);
 
-        Throwable throwable = Assertions.catchThrowable( () -> bookService.save(book));
+        Throwable throwable = Assertions.catchThrowable(() -> bookService.save(book));
 
         assertThat(throwable).isInstanceOf(BusinessException.class).hasMessage("Isbn já cadastrada");
 
@@ -89,7 +88,7 @@ public class BookServiceTest {
 
         Optional<Book> bookReturned = bookService.findById(book.getId());
 
-        Mockito.verify(bookRepository,times(1) ).findById(book.getId());
+        Mockito.verify(bookRepository, times(1)).findById(book.getId());
 
         assertThat(bookReturned.isPresent()).isTrue();
         assertThat(book.getId()).isEqualTo(bookReturned.get().getId());
@@ -107,7 +106,7 @@ public class BookServiceTest {
 
         Optional<Book> bookReturned = bookService.findById(anyLong());
 
-        Mockito.verify(bookRepository,times(1) ).findById(anyLong());
+        Mockito.verify(bookRepository, times(1)).findById(anyLong());
 
         assertThat(bookReturned.isPresent()).isFalse();
 
@@ -121,7 +120,7 @@ public class BookServiceTest {
 
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> bookService.delete(book));
 
-        Mockito.verify(bookRepository,times(1) ).delete(book);
+        Mockito.verify(bookRepository, times(1)).delete(book);
 
     }
 
@@ -148,7 +147,7 @@ public class BookServiceTest {
 
         Book bookUpdated = bookService.update(book);
 
-        Mockito.verify(bookRepository,times(1) ).save(book);
+        Mockito.verify(bookRepository, times(1)).save(book);
 
         assertThat(bookUpdated).isNotNull();
 
@@ -158,7 +157,7 @@ public class BookServiceTest {
     @DisplayName("Should throw a exception when try to update a book that dont exist")
     public void ShouldNotUpdateBookByIdTest() throws Exception {
 
-        Throwable throwable = Assertions.catchThrowable( () -> bookService.update(new Book()));
+        Throwable throwable = Assertions.catchThrowable(() -> bookService.update(new Book()));
 
         assertThat(throwable).isInstanceOf(IllegalArgumentException.class).hasMessage("Book id cant be null.");
 
@@ -171,7 +170,7 @@ public class BookServiceTest {
         // cenario
         Book book = createValidBook();
 
-        Page<Book> page = new PageImpl<Book>(Arrays.asList(book), PageRequest.of(0,10), 1);
+        Page<Book> page = new PageImpl<Book>(Arrays.asList(book), PageRequest.of(0, 10), 1);
 
         when(bookRepository.findAll(any(Example.class), any(PageRequest.class))).thenReturn(page);
 
@@ -189,5 +188,22 @@ public class BookServiceTest {
 
     }
 
+    @Test
+    @DisplayName("Should get book by isbn")
+    void getBookByIsbn() {
 
+        Book book = createValidBook();
+
+        when(bookRepository.findByIsbn(book.getIsbn())).thenReturn(Optional.of(book));
+
+        Optional<Book> bookReturned = bookService.getBookByIsbn(book.getIsbn());
+
+        Mockito.verify(bookRepository, times(1)).findByIsbn(book.getIsbn());
+
+        assertThat(bookReturned.isPresent()).isTrue();
+        assertThat(book.getId()).isEqualTo(bookReturned.get().getId());
+        assertThat(book.getAuthor()).isEqualTo(bookReturned.get().getAuthor());
+        assertThat(book.getTitle()).isEqualTo(bookReturned.get().getTitle());
+        assertThat(book.getIsbn()).isEqualTo(bookReturned.get().getIsbn());
+    }
 }
