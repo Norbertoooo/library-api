@@ -9,10 +9,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -31,7 +34,7 @@ public class LoanRepositoryTest {
 
     @Test
     @DisplayName("Should return true when search for a loan")
-    public void returnTrueWhenIsbnExists() {
+    public void returnTrueWhenIsbnExistsTest() {
         Book book = Book.builder().author("vitu").title("desgraça").isbn(123231L).build();
 
         Loan loan = Loan.builder().customer("vitor").book(book).loanDate(LocalDate.now()).build();
@@ -47,7 +50,7 @@ public class LoanRepositoryTest {
 
     @Test
     @DisplayName("Should return loan by id")
-    public void returnLoanById() {
+    public void returnLoanByIdTest() {
         Book book = Book.builder().author("vitu").title("desgraça").isbn(123231L).build();
 
         Loan loan = Loan.builder().customer("vitor").book(book).loanDate(LocalDate.now()).build();
@@ -62,6 +65,25 @@ public class LoanRepositoryTest {
         assertThat(result.get().getLoanDate()).isEqualTo(loan.getLoanDate());
         assertThat(result.get().getCustomer()).isEqualTo(loan.getCustomer());
         assertThat(result.get().getBook()).isEqualTo(loan.getBook());
+    }
+
+    @Test
+    @DisplayName("Should return loan using filters")
+    public void returnLoanUsingFilterTest() {
+        Book book = Book.builder().author("vitu").title("desgraça").isbn(123231L).build();
+
+        Loan loan = Loan.builder().customer("vitor").book(book).loanDate(LocalDate.now()).build();
+
+        testEntityManager.persist(book);
+
+        testEntityManager.persist(loan);
+
+        Page<Loan> result = loanRepository.findByBook_IsbnOrCustomer(123231L,"vitor", PageRequest.of(0, 10));
+
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent()).isEqualTo(Arrays.asList(loan));
+        assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+        assertThat(result.getPageable().getPageSize()).isEqualTo(10);
     }
 
 }

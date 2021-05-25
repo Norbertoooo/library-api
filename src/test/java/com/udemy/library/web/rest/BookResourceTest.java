@@ -49,7 +49,7 @@ public class BookResourceTest {
     private BookService bookService;
 
     @Test
-    @DisplayName("Should create a book with sucess")
+    @DisplayName("Should create a book with success")
     public void createBookTest() throws Exception {
 
         BookDTO bookDTO = BookDTO.builder().author("vitu").title("desgraça").isbn(123231L).build();
@@ -117,7 +117,7 @@ public class BookResourceTest {
 
     @Test
     @DisplayName("Should get book information")
-    public void getBookInformaticions() throws Exception {
+    public void getBookInformaticionsTest() throws Exception {
         // cénario (given, dado).
         Book book = createValidBook();
         given(bookService.findById(book.getId())).willReturn(Optional.of(book));
@@ -168,7 +168,7 @@ public class BookResourceTest {
 
     @Test
     @DisplayName("Should return resource not found when delete a book that dont exist")
-    public void bookNotFoundTestWhenDeleteBook() throws Exception {
+    public void bookNotFoundTestWhenDeleteBookTest() throws Exception {
         // cénario (given, dado).
         given(bookService.findById(anyLong())).willReturn(Optional.empty());
 
@@ -183,7 +183,7 @@ public class BookResourceTest {
 
     @Test
     @DisplayName("Should update book")
-    public void updateBook() throws Exception {
+    public void updateBookTest() throws Exception {
         // cénario (given, dado)
         Book book = createValidBook();
         Book bookReturned = Book.builder().id(1L).isbn(123321L).author("annhanham").title("houly").build();
@@ -209,7 +209,7 @@ public class BookResourceTest {
 
     @Test
     @DisplayName("Should return resource not found when update a book that dont exist")
-    public void bookNotFoundTestWhenUpdateBook() throws Exception {
+    public void bookNotFoundTestWhenUpdateBookTest() throws Exception {
 
         String json = new ObjectMapper().writeValueAsString(createValidBook());
 

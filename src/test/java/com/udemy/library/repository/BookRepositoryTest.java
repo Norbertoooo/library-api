@@ -30,7 +30,7 @@ public class BookRepositoryTest {
 
     @Test
     @DisplayName("Should return true when search for a book by isbn that already exist")
-    public void returnTrueWhenIsbnExists() {
+    public void returnTrueWhenIsbnExistsTest() {
 
         testEntityManager.persist(Book.builder().isbn(123L).build());
 
@@ -41,7 +41,7 @@ public class BookRepositoryTest {
 
     @Test
     @DisplayName("Should return false when search for a book by isbn that dont exist")
-    public void returnFalseWhenIsbnDontExists() {
+    public void returnFalseWhenIsbnDontExistsTest() {
 
         Boolean resposta = bookRepository.existsByIsbn(123L);
 
@@ -50,7 +50,7 @@ public class BookRepositoryTest {
 
     @Test
     @DisplayName("Should return true when search for a book by id that already exist")
-    public void returnTrueWhenIdExists() {
+    public void returnTrueWhenIdExistsTest() {
 
         Book bookPersisted = Book.builder().title("o carrasco").author("draven").isbn(1233L).build();
 
@@ -64,7 +64,7 @@ public class BookRepositoryTest {
 
     @Test
     @DisplayName("Should return false when search for a book by id that dont exist")
-    public void returnFalseWhenBookIdDontExists() {
+    public void returnFalseWhenBookIdDontExistsTest() {
 
         Optional<Book> resposta = bookRepository.findById(123L);
 

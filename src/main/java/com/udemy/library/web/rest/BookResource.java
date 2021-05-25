@@ -1,18 +1,14 @@
 package com.udemy.library.web.rest;
 
 import com.udemy.library.domain.Book;
-import com.udemy.library.exception.BusinessException;
 import com.udemy.library.service.BookService;
 import com.udemy.library.web.rest.dto.BookDTO;
-import com.udemy.library.web.rest.errors.ApiErrors;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -45,8 +41,8 @@ public class BookResource {
     public BookDTO getById(@PathVariable Long id) {
         log.info("Request to find book by id: {}", id);
         return bookService.findById(id)
-                .map( book -> modelMapper.map(book, BookDTO.class))
-                .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .map(book -> modelMapper.map(book, BookDTO.class))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping()
@@ -69,7 +65,7 @@ public class BookResource {
                     book.setIsbn(bookDTO.getIsbn());
                     return modelMapper.map(bookService.update(book), BookDTO.class);
                 })
-                .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
     }
 
@@ -77,7 +73,7 @@ public class BookResource {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable Long id) {
         log.info("Request to delete book by id: {}", id);
-        Book book = bookService.findById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Book book = bookService.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         bookService.delete(book);
     }
 
