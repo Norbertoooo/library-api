@@ -157,9 +157,9 @@ public class BookServiceTest {
     @DisplayName("Should throw a exception when try to update a book that dont exist")
     public void ShouldNotUpdateBookByIdTest() throws Exception {
 
-         Throwable throwable = Assertions.catchThrowable(() -> bookService.update(new Book()));
+        Throwable throwable = Assertions.catchThrowable(() -> bookService.update(new Book()));
 
-        assertThat(throwable).isInstanceOf(IllegalArgumentException.class).hasMessage("Book id.");
+        assertThat(throwable).isInstanceOf(IllegalArgumentException.class).hasMessage("Book id cant be null.");
 
         Mockito.verify(bookRepository, never()).save(new Book());
     }
